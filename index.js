@@ -4,7 +4,7 @@ const { Sequelize, Model, DataTypes } = require('sequelize')
 const app = express()
 const port = process.env.PORT
 const dbUrl = process.env.DATABASE_URL
-const serverSecret = process.env.SECRET
+const serverSecret = process.env.SECRET // TODO: use yubi key auth instead of shared secret
 const sequelize = new Sequelize(dbUrl, {dialect: 'postgres'})
 
 class Proxy extends Model {}
@@ -40,7 +40,9 @@ const postHandler = async(req, res) => {
 
 const getHandler = async(req, res) => {
     const guid = req.query.guid
-    if (!guid) return res.status(400).send("please provide ?guid")
+    const secret = req.query.secret
+    if (!guid || !secret) return res.status(400).send("Invalid params")
+    if (secret != serverSecret) return res.status(403).send("Forbidden")
     try {
         const proxy = await Proxy.findOne({where:{guid}})
         if (!proxy) return res.status(400).send("no such guid exists")
