@@ -14,11 +14,7 @@ const updateNgrokUrl = url => {
     return true
 }
 
-const customRouter = function(req) {
-    return 'https://www.example.org'; // protocol + host
-}
-
-const options = {target: noUrlRoute, router: customRouter, changeOrigin: true}
+const options = {target: noUrlRoute, router: (_) => options.target, changeOrigin: true}
 
 ;(async() => {
     try {
