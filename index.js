@@ -59,7 +59,7 @@ const options = {target: 'https://google.com', router: getDefaultProxyTable(), c
 
 ;(async() => {
     try {
-        await sequelize.sync()
+        await sequelize.sync({force: true})
         await refreshInfo()
     } catch(err) {
         console.error(err)
