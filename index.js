@@ -36,7 +36,7 @@ const getProxyInfo = async() => {
 
 const updateNgrokUrl = async (path, dst) => {
     console.log(path, dst)
-    let proxy = Proxy.findOne({where:{path}})
+    let proxy = await Proxy.findOne({where:{path}})
     if (proxy == null) {
         proxy = await Proxy.create({path, dst})
     } else {
