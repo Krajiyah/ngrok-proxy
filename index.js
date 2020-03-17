@@ -4,7 +4,7 @@ const redis = require("redis")
 const client = redis.createClient(process.env.REDIS_URL)
 const app = express()
 const ngrokRedisKey = "ngrok"
-const noUrlRoute = "/no_url"
+const noUrlRoute = process.env.HOST + "/no_url"
  
 const getNgrokUrl = () => new Promise((resolve, reject) => client.get(ngrokRedisKey, (err, value) => err ? reject(err) : resolve(value)))
 
