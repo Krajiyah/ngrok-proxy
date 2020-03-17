@@ -69,12 +69,7 @@ const options = {target: 'https://google.com', router: getDefaultProxyTable(), c
     } catch(err) {
         console.error(err)
     }
-    const api = express.Router()
-    api.use(bodyParser.urlencoded({extended: true}))
-    api.post('/ngrok', postHandler)
-    const proxy = express.Router()
-    proxy.use(createProxyMiddleware(options))
-    app.use(api)
-    // app.use(proxy)
+    app.post('/ngrok', bodyParser.urlencoded({extended: true}), postHandler)
+    // app.use(createProxyMiddleware(options))
     app.listen(port || 3000)
 })()
