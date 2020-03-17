@@ -1,4 +1,5 @@
 const express = require('express')
+const bodyParser = require('body-parser')
 const { createProxyMiddleware } = require('http-proxy-middleware')
 const { Sequelize, Model, DataTypes } = require('sequelize')
 const app = express()
@@ -64,6 +65,7 @@ const options = {target: 'https://google.com', router: getDefaultProxyTable(), c
     } catch(err) {
         console.error(err)
     }
+    app.use(bodyParser.json())
     app.post('/ngrok', postHandler)
     app.use(createProxyMiddleware(options))
     app.listen(port || 3000)
