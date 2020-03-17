@@ -35,10 +35,10 @@ const getProxyInfo = async() => {
 }
 
 const updateNgrokUrl = async (path, dst) => {
+    console.log(path, dst)
     const proxy = await Proxy.findOrCreate({where:{path}})
     await proxy.update({dst})
-    const info = await getProxyInfo()
-    Object.assign(options, info)
+    await refreshInfo()
 }
 
 const refreshInfo = async() => {
@@ -52,7 +52,7 @@ const postHandler = async(req, res) => {
         res.send("saved")
     } catch(err) {
         console.error(err)
-        res.send('could not save :(')
+        res.status(500).send('could not save :(')
     }
 }
 
