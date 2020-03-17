@@ -9,29 +9,35 @@ const dbUrl = process.env.DATABASE_URL
 const sequelize = new Sequelize(dbUrl, {dialect: 'postgres'})
 const defaultRootUrl = 'https://google.com'
 
-class Proxy extends Model {}
-Proxy.init({
-    path: DataTypes.STRING,
-    dst: DataTypes.STRING
-}, { sequelize, modelName: 'proxy' })
-
 const getDefaultProxyTable = () => {
     const table = {}
     table[domain+'/bing'] = 'https://bing.com'
     table[domain+'/yahoo'] = 'https://yahoo.com'
     return table
 }
+
+class Proxy extends Model {}
+Proxy.init({
+    path: DataTypes.STRING,
+    dst: DataTypes.STRING
+}, { sequelize, modelName: 'proxy' })
+
+const proxyTable = getDefaultProxyTable()
+
+const proxyRouter = function(req) {
+    const path = req.path
+    console.log("PATH: ", path)
+    if (Object.keys(proxyTable).includes(path)) return proxyTable[path]
+    return defaultRootUrl
+}
  
-const getProxyInfo = async() => {
+const getProxyTable = async() => {
     const proxies = await Proxy.findAll()
-    if (proxies.length == 0) return {router: getDefaultProxyTable(), target: defaultRootUrl}
-    return proxies.reduce((info, proxy) => {
-        if (proxy.path == '/') {
-            info.target = proxy.dst
-        }
-        info.router[domain + proxy.path] = proxy.dst
-        return info
-    }, {router: {}, target: defaultRootUrl})
+    if (proxies.length == 0) return getDefaultProxyTable()
+    return proxies.reduce((table, proxy) => {
+        table[domain + proxy.path] = proxy.dst
+        return table
+    }, {})
 }
 
 const updateNgrokUrl = async (path, dst) => {
@@ -43,18 +49,18 @@ const updateNgrokUrl = async (path, dst) => {
         proxy.dst = dst
         await proxy.save()
     }
-    await refreshInfo()
 }
 
 const refreshInfo = async() => {
-    const info = await getProxyInfo()
-    Object.assign(options, info)
-    console.log("INFO: ", options)
+    const table = await getProxyTable()
+    Object.assign(proxyTable, table)
+    console.log("TABLE: ", proxyTable)
 }
 
 const deleteHandler = async(_, res)  => {
     try {
         await Proxy.destroy({where: {}, truncate: true})
+        await refreshInfo()
         res.send("cleared proxy table")
     } catch(err) {
         console.error(err)
@@ -68,6 +74,7 @@ const postHandler = async(req, res) => {
         const dst = req.body.url
         if (!path || !dst) return res.status(400).send("Invalid params")
         await updateNgrokUrl(path, dst)
+        await refreshInfo()
         res.send("saved")
     } catch(err) {
         console.error(err)
@@ -75,7 +82,7 @@ const postHandler = async(req, res) => {
     }
 }
 
-const options = {target: defaultRootUrl, router: getDefaultProxyTable(), changeOrigin: true}
+const options = {target: defaultRootUrl, router: proxyRouter, changeOrigin: true}
 
 ;(async() => {
     try {
