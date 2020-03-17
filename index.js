@@ -3,17 +3,16 @@ const bodyParser = require('body-parser')
 const { createProxyMiddleware } = require('http-proxy-middleware')
 const { Sequelize, Model, DataTypes } = require('sequelize')
 const app = express()
-const domain = process.env.DOMAIN
 const port = process.env.PORT
 const dbUrl = process.env.DATABASE_URL
 const sequelize = new Sequelize(dbUrl, {dialect: 'postgres'})
 const defaultRootUrl = 'https://google.com'
 
 const getDefaultProxyTable = () => {
-    const table = {}
-    table[domain+'/bing'] = 'https://bing.com'
-    table[domain+'/yahoo'] = 'https://yahoo.com'
-    return table
+    return {
+        bing: 'https://bing.com',
+        yahoo: 'https://yahoo.com'
+    }
 }
 
 class Proxy extends Model {}
