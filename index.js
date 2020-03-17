@@ -48,7 +48,10 @@ const refreshInfo = async() => {
 
 const postHandler = async(req, res) => {
     try {
-        await updateNgrokUrl(req.body.path, req.body.url)
+        const path = req.body.path
+        const dst = req.body.url
+        if (!path || !dst) return res.status(400).send("Invalid params")
+        await updateNgrokUrl(dst, path)
         res.send("saved")
     } catch(err) {
         console.error(err)
@@ -65,7 +68,7 @@ const options = {target: 'https://google.com', router: getDefaultProxyTable(), c
     } catch(err) {
         console.error(err)
     }
-    app.use(bodyParser.json())
+    app.use(bodyParser.urlencoded({extended: true}))
     app.post('/ngrok', postHandler)
     app.use(createProxyMiddleware(options))
     app.listen(port || 3000)
