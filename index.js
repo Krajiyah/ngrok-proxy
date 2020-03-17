@@ -14,7 +14,7 @@ const updateNgrokUrl = url => {
     return true
 }
 
-const options = {target: noUrlRoute, router: (_) => options.target, changeOrigin: true}
+const options = {target: noUrlRoute, router: (_) => process.env.HOST, changeOrigin: true}
 
 ;(async() => {
     try {
