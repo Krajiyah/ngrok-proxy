@@ -6,7 +6,7 @@ const app = express()
 const port = process.env.PORT
 const dbUrl = process.env.DATABASE_URL
 const sequelize = new Sequelize(dbUrl, {dialect: 'postgres'})
-const defaultRootUrl = 'http://localhost:8000'
+const defaultRootUrl = 'https://google.com'
 
 const getDefaultProxyTable = () => {
     return {
@@ -89,6 +89,11 @@ const postHandler = async(req, res) => {
     }
     app.post('/ngrok', bodyParser.json(), postHandler)
     app.delete('/ngrok', deleteHandler)
-    app.use(createProxyMiddleware({target: defaultRootUrl, router: proxyRouter, changeOrigin: true}))
+    app.use(createProxyMiddleware({
+        target: defaultRootUrl,
+        router: proxyRouter,
+        changeOrigin: true,
+        followRedirects: true
+    }))
     app.listen(port || 3000)
 })()
