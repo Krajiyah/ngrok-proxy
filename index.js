@@ -22,9 +22,8 @@ const options = {target: noUrlRoute}
     } catch(err) {
         console.error(err)
     }
+    const myProxy = createProxyMiddleware(options)
+    app.use(myProxy)
+    app.post('/ngrok', (req, res) => updateNgrokUrl(req.body.url) && res.send("saved"))
+    app.listen(process.env.PORT || 3000)
 })()
-
-const myProxy = createProxyMiddleware(options)
-app.use(myProxy)
-app.post('/ngrok', (req, res) => updateNgrokUrl(req.body.url) && res.send("saved"))
-app.listen(process.env.PORT || 3000)
