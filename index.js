@@ -64,7 +64,7 @@ const options = {target: 'https://google.com', router: getDefaultProxyTable(), c
     } catch(err) {
         console.error(err)
     }
-    app.use('/proxy', createProxyMiddleware(options))
     app.post('/ngrok', postHandler)
+    app.use(createProxyMiddleware(options))
     app.listen(port || 3000)
 })()
