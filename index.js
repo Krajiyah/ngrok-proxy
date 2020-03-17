@@ -6,7 +6,7 @@ const app = express()
 const port = process.env.PORT
 const dbUrl = process.env.DATABASE_URL
 const sequelize = new Sequelize(dbUrl, {dialect: 'postgres'})
-const defaultRootUrl = 'https://google.com'
+const defaultRootUrl = 'http://localhost:8000'
 
 const getDefaultProxyTable = () => {
     return {
