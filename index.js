@@ -81,8 +81,6 @@ const postHandler = async(req, res) => {
     }
 }
 
-const options = {target: defaultRootUrl, router: proxyRouter, changeOrigin: true}
-
 ;(async() => {
     try {
         await sequelize.sync({force: true})
@@ -92,6 +90,6 @@ const options = {target: defaultRootUrl, router: proxyRouter, changeOrigin: true
     }
     app.post('/ngrok', bodyParser.json(), postHandler)
     app.delete('/ngrok', deleteHandler)
-    app.use(createProxyMiddleware(options))
+    app.use(createProxyMiddleware({target: defaultRootUrl, router: proxyRouter, changeOrigin: true}))
     app.listen(port || 3000)
 })()
