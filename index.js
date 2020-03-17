@@ -10,15 +10,14 @@ const defaultRootUrl = 'https://google.com'
 
 class Proxy extends Model {}
 Proxy.init({
-    subdomain: DataTypes.STRING,
+    path: DataTypes.STRING,
     dst: DataTypes.STRING
 }, { sequelize, modelName: 'proxy' })
 
 const getDefaultProxyTable = () => {
     const table = {}
-    table['1.'+domain] = 'https://bing.com'
-    table['2.'+domain] = 'https://yahoo.com'
-    table['www.'+domain] = defaultRootUrl
+    table[domain+'/bing'] = 'https://bing.com'
+    table[domain+'/yahoo'] = 'https://yahoo.com'
     return table
 }
  
@@ -26,16 +25,16 @@ const getProxyInfo = async() => {
     const proxies = await Proxy.findAll()
     if (proxies.length == 0) return {router: getDefaultProxyTable(), target: defaultRootUrl}
     return proxies.reduce((info, proxy) => {
-        if (proxy.subdomain == 'www') {
+        if (proxy.path == '/') {
             info.target = proxy.dst
         }
-        info.router[proxy.subdomain + '.' + domain] = proxy.dst
+        info.router[domain + proxy.path] = proxy.dst
         return info
     }, {router: {}, target: defaultRootUrl})
 }
 
-const updateNgrokUrl = async (subdomain, dst) => {
-    const proxy = await Proxy.findOrCreate({where:{subdomain}})
+const updateNgrokUrl = async (path, dst) => {
+    const proxy = await Proxy.findOrCreate({where:{path}})
     await proxy.update({dst})
     const info = await getProxyInfo()
     Object.assign(options, info)
@@ -48,7 +47,7 @@ const refreshInfo = async() => {
 
 const postHandler = async(req, res) => {
     try {
-        await updateNgrokUrl(req.params.subdomain, req.body.url)
+        await updateNgrokUrl(req.body.path, req.body.url)
         res.send("saved")
     } catch(err) {
         console.error(err)
@@ -56,11 +55,7 @@ const postHandler = async(req, res) => {
     }
 }
 
-const proxyTable = {}
-proxyTable['1.'+domain] = 'https://bing.com'
-proxyTable['2.'+domain] = 'https://yahoo.com'
-
-const options = {target: 'https://google.com', router: proxyTable, changeOrigin: true}
+const options = {target: 'https://google.com', router: getDefaultProxyTable(), changeOrigin: true}
 
 ;(async() => {
     try {
@@ -70,6 +65,6 @@ const options = {target: 'https://google.com', router: proxyTable, changeOrigin:
         console.error(err)
     }
     app.use(createProxyMiddleware(options))
-    app.post('/ngrok/:subdomain', postHandler)
+    app.post('/ngrok', postHandler)
     app.listen(port || 3000)
 })()
