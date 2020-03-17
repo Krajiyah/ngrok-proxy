@@ -52,7 +52,7 @@ const postHandler = async(req, res) => {
         const path = req.body.path
         const dst = req.body.url
         if (!path || !dst) return res.status(400).send("Invalid params")
-        await updateNgrokUrl(dst, path)
+        await updateNgrokUrl(path, dst)
         res.send("saved")
     } catch(err) {
         console.error(err)
