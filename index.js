@@ -4,6 +4,7 @@ const { Sequelize, Model, DataTypes } = require('sequelize')
 const app = express()
 const port = process.env.PORT
 const dbUrl = process.env.DATABASE_URL
+const serverSecret = process.env.SECRET
 const sequelize = new Sequelize(dbUrl, {dialect: 'postgres'})
 
 class Proxy extends Model {}
@@ -26,7 +27,9 @@ const postHandler = async(req, res) => {
     try {
         const guid = req.body.guid
         const url = req.body.url
-        if (!guid || !url) return res.status(400).send("Invalid params")
+        const secret = req.body.secret
+        if (!guid || !url || !secret) return res.status(400).send("Invalid params")
+        if (secret != serverSecret) return res.status(403).send("Forbidden")
         await updateNgrokUrl(guid, url)
         res.send("saved")
     } catch(err) {
@@ -38,9 +41,14 @@ const postHandler = async(req, res) => {
 const getHandler = async(req, res) => {
     const guid = req.query.guid
     if (!guid) return res.status(400).send("please provide ?guid")
-    const proxy = await Proxy.findOne({where:{guid}})
-    if (!proxy) return res.status(400).send("no such guid exists")
-    return res.redirect(proxy.url)
+    try {
+        const proxy = await Proxy.findOne({where:{guid}})
+        if (!proxy) return res.status(400).send("no such guid exists")
+        res.redirect(proxy.url)
+    } catch(err) {
+        console.error(err)
+        res.status(500).send('Internal Error')
+    }
 }
 
 ;(async() => {
