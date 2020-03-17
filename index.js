@@ -18,7 +18,7 @@ const options = {target: noUrlRoute}
 
 ;(async() => {
     try {
-        options.target = await getNgrokUrl()
+        options.target = (await getNgrokUrl()) || noUrlRoute
     } catch(err) {
         console.error(err)
     }
