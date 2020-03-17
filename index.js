@@ -47,6 +47,16 @@ const refreshInfo = async() => {
     console.log("INFO: ", options)
 }
 
+const deleteHandler = async(_, res)  => {
+    try {
+        await Proxy.destroy({where: {}, truncate: true})
+        res.send("cleared proxy table")
+    } catch(err) {
+        console.error(err)
+        res.status(500).send("could not clear proxy table :(")
+    }
+}
+
 const postHandler = async(req, res) => {
     try {
         const path = req.body.path
@@ -70,6 +80,7 @@ const options = {target: 'https://google.com', router: getDefaultProxyTable(), c
         console.error(err)
     }
     app.post('/ngrok', bodyParser.json(), postHandler)
+    app.delete('/ngrok', deleteHandler)
     app.use(createProxyMiddleware(options))
     app.listen(port || 3000)
 })()
