@@ -75,7 +75,7 @@ const postHandler = async(req, res) => {
     }
 }
 
-const options = {target: 'https://google.com', router: getDefaultProxyTable(), changeOrigin: true}
+const options = {target: defaultRootUrl, router: getDefaultProxyTable(), changeOrigin: true}
 
 ;(async() => {
     try {
