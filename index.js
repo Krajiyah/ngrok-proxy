@@ -18,7 +18,7 @@ const customRouter = function(req) {
     return 'https://www.example.org'; // protocol + host
 }
 
-const options = {target: noUrlRoute, router: customRouter}
+const options = {target: noUrlRoute, router: customRouter, changeOrigin: true}
 
 ;(async() => {
     try {
