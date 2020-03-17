@@ -82,7 +82,7 @@ const postHandler = async(req, res) => {
 
 ;(async() => {
     try {
-        await sequelize.sync({force: true})
+        await sequelize.sync()
         await refreshInfo()
     } catch(err) {
         console.error(err)
