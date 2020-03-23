@@ -46,7 +46,7 @@ const getHandler = async(req, res) => {
     try {
         const proxy = await Proxy.findOne({where:{guid}})
         if (!proxy) return res.status(400).send("no such guid exists")
-        res.redirect(proxy.url)
+        res.send(proxy.url)
     } catch(err) {
         console.error(err)
         res.status(500).send('Internal Error')
