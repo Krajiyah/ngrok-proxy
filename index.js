@@ -5,7 +5,13 @@ const app = express()
 const port = process.env.PORT
 const dbUrl = process.env.DATABASE_URL
 const serverSecret = process.env.SECRET // TODO: use yubi key auth instead of shared secret
-const sequelize = new Sequelize(dbUrl, {dialect: 'postgres',  dialectOptions: {ssl: true}})
+const sequelize = new Sequelize(dbUrl, {
+    dialect: 'postgres',  
+    dialectOptions: {
+        ssl: true,
+        rejectUnauthorized: false
+    }
+})
 
 class Proxy extends Model {}
 Proxy.init({
