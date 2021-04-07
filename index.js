@@ -8,8 +8,10 @@ const serverSecret = process.env.SECRET // TODO: use yubi key auth instead of sh
 const sequelize = new Sequelize(dbUrl, {
     dialect: 'postgres',  
     dialectOptions: {
-        ssl: true,
-        rejectUnauthorized: false
+        ssl: {
+            require: true,
+            rejectUnauthorized: false
+        }
     }
 })
 
