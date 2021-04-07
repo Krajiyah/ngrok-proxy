@@ -56,6 +56,7 @@ const getHandler = async(req, res) => {
 ;(async() => {
     try {
         await sequelize.sync()
+        console.log("DB synced")
     } catch(err) {
         console.error(err)
     }
