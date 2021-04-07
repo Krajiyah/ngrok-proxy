@@ -64,4 +64,5 @@ const getHandler = async(req, res) => {
 
 app.post('/', bodyParser.json(), postHandler)
 app.get('/', getHandler)
+console.log("Server started and listening for requests...")
 app.listen(port || 3000)
